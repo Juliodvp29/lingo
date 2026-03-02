@@ -12,24 +12,24 @@ export const routes: Routes = [
     path: 'onboarding',
     canActivate: [authGuard],
     loadComponent: () =>
-      import('./pages/onboarding/onboarding/onboarding.page').then(m => m.OnboardingPage)
+      import('./pages/onboarding/onboarding.page').then(m => m.OnboardingPage)
   },
   {
     path: 'tabs',
     canActivate: [authGuard],
     loadComponent: () =>
-      import('./pages/tabs/tabs/tabs.page').then(m => m.TabsPage),
+      import('./pages/tabs/tabs.page').then(m => m.TabsPage),
     loadChildren: () =>
-      import('./pages/tabs/tabs/tabs.routes').then(m => m.TABS_ROUTES)
+      import('./pages/tabs/tabs.routes').then(m => m.TABS_ROUTES)
   },
 
   { path: '**', redirectTo: 'tabs' },
   {
     path: 'onboarding',
-    loadComponent: () => import('./pages/onboarding/onboarding/onboarding.page').then( m => m.OnboardingPage)
+    loadComponent: () => import('./pages/onboarding/onboarding.page').then(m => m.OnboardingPage)
   },
   {
     path: 'tabs',
-    loadComponent: () => import('./pages/tabs/tabs/tabs.page').then( m => m.TabsPage)
+    loadComponent: () => import('./pages/tabs/tabs.page').then(m => m.TabsPage)
   }
 ];
