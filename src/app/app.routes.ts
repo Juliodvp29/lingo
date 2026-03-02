@@ -22,14 +22,5 @@ export const routes: Routes = [
     loadChildren: () =>
       import('./pages/tabs/tabs.routes').then(m => m.TABS_ROUTES)
   },
-
-  { path: '**', redirectTo: 'tabs' },
-  {
-    path: 'onboarding',
-    loadComponent: () => import('./pages/onboarding/onboarding.page').then(m => m.OnboardingPage)
-  },
-  {
-    path: 'tabs',
-    loadComponent: () => import('./pages/tabs/tabs.page').then(m => m.TabsPage)
-  }
+  { path: '**', redirectTo: 'tabs' }
 ];
