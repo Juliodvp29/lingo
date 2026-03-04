@@ -11,8 +11,7 @@ export class Supabase {
   constructor() {
     this.client = createClient(
       environment.supabase.url,
-      environment.supabase.anonKey,
-      { auth: { lock: ((_name: string, _timeout: number, fn: () => Promise<unknown>) => fn()) as any } }
+      environment.supabase.anonKey
     );
   }
 }

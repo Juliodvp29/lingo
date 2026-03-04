@@ -23,16 +23,4 @@ export const routes: Routes = [
       import('./pages/tabs/tabs.routes').then(m => m.TABS_ROUTES)
   },
   { path: '**', redirectTo: 'tabs' },
-  {
-    path: 'home',
-    loadComponent: () => import('./pages/home/home.page').then( m => m.HomePage)
-  },
-  {
-    path: 'profile',
-    loadComponent: () => import('./pages/profile/profile.page').then( m => m.ProfilePage)
-  },
-  {
-    path: 'vocab',
-    loadComponent: () => import('./pages/vocab/vocab.page').then( m => m.VocabPage)
-  }
 ];

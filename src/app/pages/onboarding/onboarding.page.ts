@@ -93,7 +93,7 @@ export class OnboardingPage {
         interests: this.selectedInterests(),
         daily_goal_minutes: this.selectedGoal(),
       });
-      await this.router.navigate(['/tabs/home']);
+      await this.router.navigate(['/tabs/home'], { replaceUrl: true });
     } catch (e: any) {
       console.error('[Onboarding] Error al guardar:', e);
       this.errorMsg.set(e?.message ?? 'Error al guardar. Intenta de nuevo.');

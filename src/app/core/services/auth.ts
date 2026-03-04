@@ -90,13 +90,12 @@ export class Auth {
     const userId = this._user()?.id;
     if (!userId) throw new Error('No hay sesión activa');
 
-    const { data, error } = await this.db
+    const { error } = await this.db
       .from('users')
-      .upsert({ id: userId, ...updates })
-      .select()
-      .single();
+      .update(updates)
+      .eq('id', userId);
 
     if (error) throw error;
-    this._user.set(data as User);
+    await this.loadUserProfile(userId);
   }
 }
