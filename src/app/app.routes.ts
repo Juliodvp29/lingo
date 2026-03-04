@@ -22,5 +22,11 @@ export const routes: Routes = [
     loadChildren: () =>
       import('./pages/tabs/tabs.routes').then(m => m.TABS_ROUTES)
   },
+  {
+    path: 'reader/:id',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./pages/reader/reader.page').then(m => m.ReaderPage)
+  },
   { path: '**', redirectTo: 'tabs' },
 ];

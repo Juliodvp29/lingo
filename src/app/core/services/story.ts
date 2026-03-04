@@ -1,18 +1,18 @@
 import { Injectable } from '@angular/core';
-import { CefrLevel, StoryWithProgress } from '../models';
-import { Auth } from './auth';
-import { Supabase } from './supabase';
+import { CefrLevel, Story, StoryWithProgress } from '../models';
+import { AuthService } from './auth';
+import { SupabaseService } from './supabase';
 
 @Injectable({
   providedIn: 'root',
 })
-export class Story {
+export class StoryService {
   private get db() { return this.supabase.client; }
 
   constructor(
-    private supabase: Supabase,
-    private auth: Auth
-  ) {}
+    private supabase: SupabaseService,
+    private auth: AuthService
+  ) { }
 
   async getStoriesForFeed(level?: CefrLevel): Promise<StoryWithProgress[]> {
     const userId = this.auth.user()?.id;
@@ -35,6 +35,7 @@ export class Story {
 
     return (data as any[]).map(story => ({
       ...story,
+      scenes: story.scenes?.scenes ?? story.scenes ?? [],
       user_progress: story.user_progress?.[0] ?? null
     })) as StoryWithProgress[];
   }
@@ -47,7 +48,13 @@ export class Story {
       .single();
 
     if (error) throw error;
-    return data as Story;
+
+    const raw = data as any;
+    return {
+      ...raw,
+      scenes: raw.scenes?.scenes ?? raw.scenes ?? [],
+      quiz: raw.scenes?.quiz ?? []
+    } as Story;
   }
 
   async upsertReadingProgress(

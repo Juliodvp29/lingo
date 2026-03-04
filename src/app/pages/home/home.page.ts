@@ -4,9 +4,9 @@ import { FormsModule } from '@angular/forms';
 import { IonContent, IonSkeletonText, IonRefresher, IonRefresherContent } from '@ionic/angular/standalone';
 import { CefrLevel, StoryWithProgress } from '@app/core/models';
 import { AppStore } from '@app/core/store/app.store';
-import { Auth } from '@app/core/services/auth';
-import { Story } from '@app/core/services/story';
-import { Progress } from '@app/core/services/progress';
+import { AuthService } from '@app/core/services/auth';
+import { StoryService } from '@app/core/services/story';
+import { ProgressService } from '@app/core/services/progress';
 import { Router } from '@angular/router';
 
 @Component({
@@ -19,9 +19,9 @@ import { Router } from '@angular/router';
 export class HomePage implements OnInit {
 
   readonly store = inject(AppStore);
-  readonly auth = inject(Auth);
-  private stories$ = inject(Story);
-  private progress = inject(Progress);
+  readonly auth = inject(AuthService);
+  private stories$ = inject(StoryService);
+  private progress = inject(ProgressService);
   private router = inject(Router);
 
   stories = signal<StoryWithProgress[]>([]);

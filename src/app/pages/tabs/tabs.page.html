@@ -19,7 +19,6 @@
       </svg>
       <ion-label>Vocab</ion-label>
 
-      <!-- Badge de palabras por repasar -->
       @if (store.hasPendingReviews()) {
       <ion-badge color="danger">{{ store.reviewCount() }}</ion-badge>
       }

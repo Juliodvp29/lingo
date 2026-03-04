@@ -1,12 +1,12 @@
 import { computed, Injectable, signal } from '@angular/core';
-import { Supabase } from './supabase';
+import { SupabaseService } from './supabase';
 import { Router } from '@angular/router';
 import { User } from '../models';
 
 @Injectable({
   providedIn: 'root',
 })
-export class Auth {
+export class AuthService {
   private _user = signal<User | null>(null);
   private _loading = signal<boolean>(true);
 
@@ -18,7 +18,7 @@ export class Auth {
   private get db() { return this.supabase.client; }
 
   constructor(
-    private supabase: Supabase,
+    private supabase: SupabaseService,
     private router: Router
   ) {
     this.init();

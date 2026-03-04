@@ -5,7 +5,7 @@ import { createClient, SupabaseClient } from '@supabase/supabase-js';
 @Injectable({
   providedIn: 'root',
 })
-export class Supabase {
+export class SupabaseService {
   readonly client: SupabaseClient;
 
   constructor() {

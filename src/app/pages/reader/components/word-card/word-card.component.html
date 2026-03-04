@@ -1,0 +1,88 @@
+<div class="wc-backdrop" (click)="close.emit()"></div>
+
+<div class="wc-sheet">
+  <div class="wc-handle"></div>
+
+  <div class="wc-content">
+    <div class="wc-header">
+      <div class="wc-word-row">
+        <div>
+          <div class="wc-word">{{ word.word }}</div>
+          @if (word.ipa) {
+          <div class="wc-ipa">{{ word.ipa }}</div>
+          }
+        </div>
+
+        @if (audio.isSupported) {
+        <button class="wc-audio-btn" [class.playing]="audio.isSpeaking()" (click)="pronounce()"
+          [title]="'Pronunciar ' + word.word">
+          @if (audio.isSpeaking()) {
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round">
+            <line x1="11" y1="5" x2="11" y2="19" />
+            <line x1="7" y1="8" x2="7" y2="16" />
+            <line x1="15" y1="8" x2="15" y2="16" />
+            <line x1="3" y1="10" x2="3" y2="14" />
+            <line x1="19" y1="10" x2="19" y2="14" />
+          </svg>
+          } @else {
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+            <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+          </svg>
+          }
+        </button>
+        }
+      </div>
+
+      <button class="wc-close" (click)="close.emit()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+          stroke-linecap="round">
+          <line x1="18" y1="6" x2="6" y2="18" />
+          <line x1="6" y1="6" x2="18" y2="18" />
+        </svg>
+      </button>
+    </div>
+
+    <p class="wc-def">{{ word.definition_es }}</p>
+
+    @if (word.example_en) {
+    <div class="wc-example-row">
+      <p class="wc-example">"{{ word.example_en }}"</p>
+      <button class="wc-example-audio" (click)="audio.speak(word.example_en!)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+          stroke-linecap="round">
+          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+          <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+        </svg>
+        Escuchar ejemplo
+      </button>
+    </div>
+    }
+
+    @if (word.level) {
+    <span class="wc-level-badge">{{ word.level | uppercase }}</span>
+    }
+
+    @if (word.id) {
+    <div class="wc-actions">
+      @for (status of statusList; track status) {
+      <button class="wc-status-btn" [class]="'status-' + status" [class.active]="currentStatus === status"
+        [disabled]="isLoading" (click)="select(status)">
+        @if (isLoading && currentStatus === status) {
+        <ion-spinner name="crescent" style="width:16px;height:16px"></ion-spinner>
+        } @else {
+        {{ statusLabels[status] }}
+        }
+      </button>
+      }
+    </div>
+    } @else {
+    <p class="wc-not-found">Esta palabra aún no está en el catálogo.</p>
+    }
+
+
+  </div>
+</div>

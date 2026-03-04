@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { IonContent, IonSpinner } from '@ionic/angular/standalone';
 import { trigger, transition, style, animate } from '@angular/animations';
 import { CefrLevel, OnboardingData } from '@app/core/models';
-import { Auth } from '@app/core/services/auth';
+import { AuthService } from '@app/core/services/auth';
 import { Router } from '@angular/router';
 
 @Component({
@@ -24,7 +24,7 @@ import { Router } from '@angular/router';
 })
 export class OnboardingPage {
 
-  private auth = inject(Auth);
+  private auth = inject(AuthService);
   private router = inject(Router);
 
   step = signal(0);

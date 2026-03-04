@@ -6,7 +6,7 @@ import {
     IonContent, IonSpinner,
     ToastController
 } from '@ionic/angular/standalone';
-import { Auth } from '@services/auth';
+import { AuthService } from '@services/auth';
 
 @Component({
     selector: 'app-login',
@@ -32,7 +32,7 @@ export class LoginPage {
 
     constructor(
         private fb: FormBuilder,
-        private auth: Auth,
+        private auth: AuthService,
         private router: Router,
         private toast: ToastController,
     ) { }

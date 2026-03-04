@@ -3,8 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonTabButton, IonTabs, IonTabBar, IonLabel, IonBadge } from '@ionic/angular/standalone';
 import { AppStore } from '@app/core/store/app.store';
-import { Vocabulary } from '@app/core/services/vocabulary';
-import { Progress } from '@app/core/services/progress';
+import { VocabularyService } from '@app/core/services/vocabulary';
+import { ProgressService } from '@app/core/services/progress';
 
 @Component({
   selector: 'app-tabs',
@@ -16,8 +16,8 @@ import { Progress } from '@app/core/services/progress';
 export class TabsPage implements OnInit {
   readonly store = inject(AppStore);
 
-  private vocab = inject(Vocabulary);
-  private progress = inject(Progress);
+  private vocab = inject(VocabularyService);
+  private progress = inject(ProgressService);
 
   async ngOnInit() {
     const [stats, todayProgress, wordsDue] = await Promise.all([

@@ -1,17 +1,17 @@
 import { Injectable } from '@angular/core';
-import { Supabase } from './supabase';
-import { Auth } from './auth';
-import { UserVocabulary, UserVocabularyWithWord, VocabStatus, WordDueToday } from '../models';
+import { SupabaseService } from './supabase';
+import { AuthService } from './auth';
+import { UserVocabulary, UserVocabularyWithWord, VocabStatus, Vocabulary, WordDueToday } from '../models';
 
 @Injectable({
   providedIn: 'root',
 })
-export class Vocabulary {
+export class VocabularyService {
   private get db() { return this.supabase.client; }
 
   constructor(
-    private supabase: Supabase,
-    private auth: Auth
+    private supabase: SupabaseService,
+    private auth: AuthService
   ) {}
 
   async lookupWord(word: string): Promise<Vocabulary | null> {

@@ -1,0 +1,169 @@
+@if (loading()) {
+<ion-content>
+  <div class="reader-loading">
+    <ion-spinner name="crescent" color="primary"></ion-spinner>
+  </div>
+</ion-content>
+}
+
+@if (!loading() && story()) {
+<ion-content [fullscreen]="true" [scrollEvents]="true" (ionScroll)="onScroll($event)">
+
+  <div class="reader-header">
+    <button class="back-btn" (click)="goHome()">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+        stroke-linecap="round">
+        <path d="M19 12H5M12 19l-7-7 7-7" />
+      </svg>
+    </button>
+    <div class="reader-meta">
+      <h2>{{ story()!.title }}</h2>
+      <span>{{ story()!.level | uppercase }} · {{ story()!.estimated_minutes ?? '?' }} min</span>
+    </div>
+    @if (readProgress() >= 80) {
+    <button class="quiz-btn" (click)="startQuiz()">Quiz</button>
+    }
+  </div>
+
+  <div class="read-progress-bar">
+    <div class="read-progress-fill" [style.width.%]="readProgress()"></div>
+  </div>
+
+  <div class="reader-body">
+
+    @for (item of tokenizedScenes(); track $index; let sceneIndex = $index) {
+
+    @if (item.scene.type === 'narration') {
+    <div class="scene-narration">
+      <p class="scene-text">
+        @for (token of item.tokens; track $index) {
+        <span [class.highlight]="playingSceneIndex() === sceneIndex && 
+                   audio.currentCharIndex() !== null && 
+                   audio.currentCharIndex()! >= token.start && 
+                   audio.currentCharIndex()! < token.end">
+          @if (token.type === 'text') {
+          <span>{{ token.content }}</span>
+          } @else {
+          <span class="word-token" [class]="'status-' + (getWordStatus(token.content) ?? 'none')"
+            (click)="onWordTap(token.content)">{{ token.content }}</span>
+          }
+        </span>
+        }
+      </p>
+      <div class="scene-footer">
+        <app-translation [text]="item.scene.translation_es"></app-translation>
+        @if (audio.isSupported) {
+        <button class="scene-audio-btn" [class.active]="audio.isSpeaking() && playingSceneIndex() === sceneIndex"
+          (click)="toggleSceneAudio(item.scene, sceneIndex)">
+          {{ (audio.isSpeaking() && playingSceneIndex() === sceneIndex) ? '⏹ Detener' : '🔊 Escuchar' }}
+        </button>
+        }
+      </div>
+    </div>
+    }
+
+    @if (item.scene.type === 'dialogue') {
+    <div class="scene-dialogue">
+      <div class="dialogue-char">
+        <div class="char-avatar" [style.background]="item.scene.bg_color ?? '#F0F0F0'">
+          {{ item.scene.emoji ?? '👤' }}
+        </div>
+        <span class="char-name">{{ item.scene.character ?? 'Personaje' }}</span>
+      </div>
+      <div class="dialogue-bubble">
+        <p class="scene-text">
+          @for (token of item.tokens; track $index) {
+          <span [class.highlight]="playingSceneIndex() === sceneIndex && 
+                     audio.currentCharIndex() !== null && 
+                     audio.currentCharIndex()! >= token.start && 
+                     audio.currentCharIndex()! < token.end">
+            @if (token.type === 'text') {
+            <span>{{ token.content }}</span>
+            } @else {
+            <span class="word-token" [class]="'status-' + (getWordStatus(token.content) ?? 'none')"
+              (click)="onWordTap(token.content)">{{ token.content }}</span>
+            }
+          </span>
+          }
+        </p>
+        <div class="scene-footer">
+          <app-translation [text]="item.scene.translation_es"></app-translation>
+          @if (audio.isSupported) {
+          <button class="scene-audio-btn" [class.active]="audio.isSpeaking() && playingSceneIndex() === sceneIndex"
+            (click)="toggleSceneAudio(item.scene, sceneIndex)">
+            {{ (audio.isSpeaking() && playingSceneIndex() === sceneIndex) ? '⏹ Detener' : '🔊 Escuchar' }}
+          </button>
+          }
+        </div>
+      </div>
+    </div>
+    }
+
+    }
+
+    @if (readProgress() < 80) { <div class="end-cta">
+      <p>¿Terminaste de leer?</p>
+      <button class="btn-finish" (click)="startQuiz()">
+        Completar historia →
+      </button>
+  </div>
+  }
+
+  </div>
+
+</ion-content>
+}
+
+@if (activeWord()) {
+<app-word-card [word]="activeVocab() ?? { 
+  id:'', 
+  word: activeWord()!, 
+  ipa: null, 
+  definition_es: activeVocab() === null && !wordCardLoading() 
+    ? 'Palabra no encontrada en el catálogo aún.' 
+    : 'Buscando...', 
+  example_en: null, 
+  audio_url: null, 
+  frequency_rank: null, 
+  level: null 
+}" [currentStatus]="activeStatus()" [isLoading]="wordCardLoading()" (statusChange)="onStatusChange($event)"
+  (close)="closeWordCard()" />
+}
+
+@if (showQuiz()) {
+<app-quiz [questions]="quizQuestions()" [storyTitle]="story()?.title ?? ''" (completed)="onQuizCompleted($event)"
+  (dismissed)="showQuiz.set(false)" />
+}
+
+@if (showResult() && sessionResult()) {
+<div class="result-screen">
+  <div class="result-content">
+    <div class="result-icon">🎉</div>
+    <h1 class="result-title">¡Historia completada!</h1>
+    <p class="result-sub">{{ story()?.title }}</p>
+
+    <div class="result-stats">
+      <div class="stat-card">
+        <strong>{{ sessionResult()!.wordsLearned }}</strong>
+        <span>palabras</span>
+      </div>
+      <div class="stat-card">
+        <strong>{{ sessionResult()!.minutesRead }} min</strong>
+        <span>leídos</span>
+      </div>
+      @if (sessionResult()!.totalQuestions > 0) {
+      <div class="stat-card">
+        <strong>{{ sessionResult()!.score }}/{{ sessionResult()!.totalQuestions }}</strong>
+        <span>quiz</span>
+      </div>
+      }
+      <div class="stat-card accent">
+        <strong>+{{ sessionResult()!.xpAwarded }} XP</strong>
+        <span>ganados</span>
+      </div>
+    </div>
+
+    <button class="btn-home" (click)="goHome()">Volver al inicio</button>
+  </div>
+</div>
+}

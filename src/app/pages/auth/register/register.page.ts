@@ -5,7 +5,7 @@ import {
 } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { IonContent, IonSpinner } from '@ionic/angular/standalone';
-import { Auth } from '@services/auth';
+import { AuthService } from '@app/core/services/auth';
 
 function passwordsMatch(control: AbstractControl): ValidationErrors | null {
     const pw = control.get('password')?.value;
@@ -41,7 +41,7 @@ export class RegisterPage {
 
     constructor(
         private fb: FormBuilder,
-        private auth: Auth,
+        private auth: AuthService,
         private router: Router,
     ) { }
 

@@ -76,7 +76,13 @@
     <div class="story-grid">
       @for (story of stories(); track story.id) {
       <div class="story-card" (click)="openStory(story.id)">
-        <div class="story-thumb" [style.background]="levelColor(story.level) + '18'">
+        <div class="story-thumb">
+          @if (story.cover_image_url) {
+          <img [src]="story.cover_image_url" alt="" class="story-cover-img" />
+          } @else {
+          <div class="story-thumb-fallback" [style.background]="levelColor(story.level) + '18'">
+          </div>
+          }
           <div class="story-level-dot" [style.background]="levelColor(story.level)">
             {{ story.level | uppercase }}
           </div>

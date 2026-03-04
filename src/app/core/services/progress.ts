@@ -1,18 +1,18 @@
 import { Injectable } from '@angular/core';
-import { Auth } from './auth';
-import { Supabase } from './supabase';
+import { AuthService } from './auth';
+import { SupabaseService } from './supabase';
 import { DailyProgress, UserStats } from '../models';
 
 @Injectable({
   providedIn: 'root',
 })
-export class Progress {
+export class ProgressService {
   private get db() { return this.supabase.client; }
 
   constructor(
-    private supabase: Supabase,
-    private auth: Auth
-  ) {}
+    private supabase: SupabaseService,
+    private auth: AuthService
+  ) { }
 
   async getUserStats(): Promise<UserStats | null> {
     const userId = this.auth.user()?.id;
@@ -32,7 +32,7 @@ export class Progress {
     const userId = this.auth.user()?.id;
     if (!userId) return null;
 
-    const today = new Date().toISOString().split('T')[0]; 
+    const today = new Date().toISOString().split('T')[0];
 
     const { data } = await this.db
       .from('daily_progress')
@@ -53,9 +53,9 @@ export class Progress {
     if (!userId) return;
 
     const { error } = await this.db.rpc('update_daily_progress', {
-      p_user_id:       userId,
-      p_minutes:       minutesRead,
-      p_xp:            xpEarned,
+      p_user_id: userId,
+      p_minutes: minutesRead,
+      p_xp: xpEarned,
       p_words_learned: wordsLearned
     });
 
