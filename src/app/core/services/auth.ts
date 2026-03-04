@@ -10,7 +10,7 @@ export class Auth {
   private _user = signal<User | null>(null);
   private _loading = signal<boolean>(true);
 
-  readonly user    = this._user.asReadonly();
+  readonly user = this._user.asReadonly();
   readonly loading = this._loading.asReadonly();
 
   readonly isLoggedIn = computed(() => this._user() !== null);
@@ -88,12 +88,11 @@ export class Auth {
 
   async updateProfile(updates: Partial<User>) {
     const userId = this._user()?.id;
-    if (!userId) return;
+    if (!userId) throw new Error('No hay sesión activa');
 
     const { data, error } = await this.db
       .from('users')
-      .update(updates)
-      .eq('id', userId)
+      .upsert({ id: userId, ...updates })
       .select()
       .single();
 

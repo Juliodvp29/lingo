@@ -1,13 +1,92 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>onboarding</ion-title>
-  </ion-toolbar>
-</ion-header>
+<ion-content>
+  <div class="ob-wrapper">
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">onboarding</ion-title>
-    </ion-toolbar>
-  </ion-header>
+    <div class="ob-dots">
+      @for (dot of [0,1,2]; track dot) {
+      <div class="ob-dot" [class.active]="step() >= dot"></div>
+      }
+    </div>
+
+    @if (step() === 0) {
+    <div class="ob-step" @fadeSlide>
+      <div class="ob-emoji">📚</div>
+      <h1 class="ob-title">¿Cuál es tu nivel de inglés?</h1>
+      <p class="ob-sub">Personalizamos las historias según tu nivel</p>
+
+      <div class="level-grid">
+        @for (lvl of levels; track lvl.value) {
+        <button class="level-card" [class.selected]="selectedLevel() === lvl.value"
+          (click)="selectedLevel.set(lvl.value)">
+          <span class="level-badge">{{ lvl.value | uppercase }}</span>
+          <span class="level-name">{{ lvl.label }}</span>
+          <span class="level-desc">{{ lvl.desc }}</span>
+        </button>
+        }
+      </div>
+    </div>
+    }
+
+    @if (step() === 1) {
+    <div class="ob-step" @fadeSlide>
+      <div class="ob-emoji">🎯</div>
+      <h1 class="ob-title">¿Qué temas te interesan?</h1>
+      <p class="ob-sub">Elige al menos uno para empezar</p>
+
+      <div class="interest-grid">
+        @for (interest of interests; track interest.value) {
+        <button class="interest-chip" [class.selected]="isInterestSelected(interest.value)"
+          (click)="toggleInterest(interest.value)">
+          {{ interest.emoji }} {{ interest.label }}
+        </button>
+        }
+      </div>
+    </div>
+    }
+
+    @if (step() === 2) {
+    <div class="ob-step" @fadeSlide>
+      <div class="ob-emoji">⏱️</div>
+      <h1 class="ob-title">¿Cuánto tiempo al día?</h1>
+      <p class="ob-sub">Incluso 5 minutos diarios marcan la diferencia</p>
+
+      <div class="goal-list">
+        @for (goal of goals; track goal.minutes) {
+        <button class="goal-item" [class.selected]="selectedGoal() === goal.minutes"
+          (click)="selectedGoal.set(goal.minutes)">
+          <div class="goal-left">
+            <span class="goal-icon">{{ goal.emoji }}</span>
+            <div>
+              <span class="goal-label">{{ goal.label }}</span>
+              <span class="goal-desc">{{ goal.desc }}</span>
+            </div>
+          </div>
+          @if (selectedGoal() === goal.minutes) {
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--lingo-accent)" stroke-width="2.5">
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
+          }
+        </button>
+        }
+      </div>
+    </div>
+    }
+
+    <div class="ob-footer">
+      <button class="btn-next" [disabled]="!canAdvance() || isLoading()" (click)="advance()">
+        @if (isLoading()) {
+        <ion-spinner name="crescent" color="light"></ion-spinner>
+        } @else {
+        {{ step() < 2 ? 'Continuar' : '¡Empezar!' }} @if (step() < 2) { <svg width="18" height="18" viewBox="0 0 24 24"
+          fill="none" stroke="currentColor" stroke-width="2.5">
+          <polyline points="9 18 15 12 9 6" />
+          </svg>
+          }
+          }
+      </button>
+      @if (errorMsg()) {
+      <p class="ob-error">{{ errorMsg() }}</p>
+      }
+    </div>
+
+  </div>
 </ion-content>

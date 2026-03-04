@@ -6,12 +6,13 @@ import { createClient, SupabaseClient } from '@supabase/supabase-js';
   providedIn: 'root',
 })
 export class Supabase {
-   readonly client: SupabaseClient;
+  readonly client: SupabaseClient;
 
   constructor() {
     this.client = createClient(
       environment.supabase.url,
-      environment.supabase.anonKey
+      environment.supabase.anonKey,
+      { auth: { lock: ((_name: string, _timeout: number, fn: () => Promise<unknown>) => fn()) as any } }
     );
   }
 }

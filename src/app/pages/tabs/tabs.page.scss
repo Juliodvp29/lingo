@@ -1,0 +1,29 @@
+ion-tab-bar {
+    --background: var(--lingo-surface);
+    --border: 1px solid var(--lingo-border);
+    padding-bottom: env(safe-area-inset-bottom);
+    height: 56px;
+}
+
+ion-tab-button {
+    --color: var(--lingo-ink-muted);
+    --color-selected: var(--lingo-accent);
+
+    ion-label {
+        font-size: 11px;
+        font-weight: 500;
+        margin-top: 3px;
+    }
+
+    &::part(native) {
+        --ripple-color: transparent;
+    }
+}
+
+ion-badge {
+    --background: #E84444;
+    font-size: 10px;
+    min-width: 16px;
+    height: 16px;
+    padding: 0 4px;
+}

@@ -1,0 +1,103 @@
+<ion-content [fullscreen]="true">
+
+  <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <div class="home-header">
+    <div class="logo">lingo<span>.</span></div>
+    @if (store.stats(); as stats) {
+    <div class="streak-badge">🔥 {{ stats.streak_days }} días</div>
+    }
+  </div>
+
+  <div class="home-scroll">
+
+    <div class="hero-section">
+      <div class="greeting">
+        Hola, <em>{{ auth.user()?.display_name?.split(' ')?.[0] ?? 'amigo' }}</em>
+      </div>
+      <p class="subgreeting">
+        Nivel {{ (auth.user()?.level || 'a1') | uppercase }} ·
+        {{ store.stats()?.words_learning ?? 0 }} palabras aprendiendo
+      </p>
+
+      <div class="daily-card">
+        <div class="ring-wrap">
+          <svg width="80" height="80" viewBox="0 0 80 80">
+            <circle cx="40" cy="40" r="32" fill="none" stroke="#E5E0D8" stroke-width="6" />
+            <circle cx="40" cy="40" r="32" fill="none" stroke="var(--lingo-accent)" stroke-width="6"
+              stroke-linecap="round" [attr.stroke-dasharray]="2 * 3.14159 * 32" [attr.stroke-dashoffset]="ringOffset"
+              style="transform:rotate(-90deg);transform-origin:center;
+                           transition:stroke-dashoffset 1s cubic-bezier(.34,1.56,.64,1)" />
+          </svg>
+          <div class="ring-label">
+            <strong>{{ store.todayProgress()?.minutes_read ?? 0 }}</strong>
+            <span>min hoy</span>
+          </div>
+        </div>
+        <div class="daily-info">
+          <h3>Meta: {{ auth.user()?.daily_goal_minutes ?? 10 }} min</h3>
+          <p>{{ store.hasPendingReviews()
+            ? store.reviewCount() + ' palabras por repasar'
+            : 'Lee una historia para avanzar' }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="level-chips">
+      @for (lvl of levels; track lvl.value) {
+      <button class="chip" [class.active]="activeLevel() === lvl.value" (click)="filterByLevel(lvl.value)">{{ lvl.label
+        }}</button>
+      }
+    </div>
+
+    <p class="sec-title">Historias recomendadas</p>
+
+    @if (loading()) {
+    <div class="story-grid">
+      @for (s of [1,2,3,4]; track s) {
+      <div class="story-card skeleton">
+        <ion-skeleton-text animated style="height:90px;border-radius:12px 12px 0 0"></ion-skeleton-text>
+        <div style="padding:12px">
+          <ion-skeleton-text animated
+            style="height:14px;width:80%;border-radius:4px;margin-bottom:8px"></ion-skeleton-text>
+          <ion-skeleton-text animated style="height:12px;width:50%;border-radius:4px"></ion-skeleton-text>
+        </div>
+      </div>
+      }
+    </div>
+    } @else if (stories().length === 0) {
+    <div class="empty-state">
+      <span>📭</span>
+      <p>No hay historias disponibles para este nivel aún.</p>
+    </div>
+    } @else {
+    <div class="story-grid">
+      @for (story of stories(); track story.id) {
+      <div class="story-card" (click)="openStory(story.id)">
+        <div class="story-thumb" [style.background]="levelColor(story.level) + '18'">
+          <div class="story-level-dot" [style.background]="levelColor(story.level)">
+            {{ story.level | uppercase }}
+          </div>
+          @if (story.user_progress?.completed) {
+          <div class="story-done">✓</div>
+          }
+        </div>
+        <div class="story-info">
+          <h4>{{ story.title }}</h4>
+          <span>~{{ story.estimated_minutes ?? '?' }} min</span>
+          @if (story.user_progress && !story.user_progress.completed) {
+          <div class="story-progress-bar">
+            <div class="story-progress-fill" [style.width.%]="story.user_progress.read_percentage">
+            </div>
+          </div>
+          }
+        </div>
+      </div>
+      }
+    </div>
+    }
+
+  </div>
+</ion-content>

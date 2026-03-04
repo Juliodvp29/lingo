@@ -1,0 +1,228 @@
+ion-content {
+    --background: var(--lingo-bg);
+}
+
+.ob-wrapper {
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 48px 24px 32px;
+}
+
+.ob-dots {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 40px;
+
+    .ob-dot {
+        flex: 1;
+        height: 4px;
+        border-radius: 4px;
+        background: var(--lingo-border);
+        transition: background 0.3s ease;
+
+        &.active {
+            background: var(--lingo-accent);
+        }
+    }
+}
+
+.ob-step {
+    flex: 1;
+
+    .ob-emoji {
+        font-size: 48px;
+        margin-bottom: 16px;
+    }
+
+    .ob-title {
+        font-size: 24px;
+        font-weight: 700;
+        color: var(--lingo-ink);
+        margin: 0 0 8px;
+        letter-spacing: -0.4px;
+        line-height: 1.25;
+    }
+
+    .ob-sub {
+        font-size: 14px;
+        color: var(--lingo-ink-muted);
+        margin: 0 0 32px;
+        line-height: 1.5;
+    }
+}
+
+// Nivel
+.level-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.level-card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    padding: 16px;
+    background: var(--lingo-surface);
+    border: 2px solid var(--lingo-border);
+    border-radius: var(--lingo-radius);
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.15s ease;
+
+    &.selected {
+        border-color: var(--lingo-accent);
+        background: #FFF0EB;
+        box-shadow: 0 0 0 3px rgba(232, 98, 58, 0.12);
+    }
+
+    .level-badge {
+        font-size: 11px;
+        font-weight: 700;
+        padding: 2px 8px;
+        background: var(--lingo-ink);
+        color: #fff;
+        border-radius: 6px;
+        letter-spacing: 0.04em;
+    }
+
+    &.selected .level-badge {
+        background: var(--lingo-accent);
+    }
+
+    .level-name {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--lingo-ink);
+        margin-top: 4px;
+    }
+
+    .level-desc {
+        font-size: 12px;
+        color: var(--lingo-ink-muted);
+        line-height: 1.4;
+    }
+}
+
+// Intereses
+.interest-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.interest-chip {
+    padding: 10px 16px;
+    background: var(--lingo-surface);
+    border: 2px solid var(--lingo-border);
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--lingo-ink);
+    cursor: pointer;
+    transition: all 0.15s ease;
+
+    &.selected {
+        border-color: var(--lingo-accent);
+        background: #FFF0EB;
+        color: var(--lingo-accent);
+    }
+}
+
+// Metas
+.goal-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.goal-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px;
+    background: var(--lingo-surface);
+    border: 2px solid var(--lingo-border);
+    border-radius: var(--lingo-radius);
+    cursor: pointer;
+    transition: all 0.15s ease;
+
+    &.selected {
+        border-color: var(--lingo-accent);
+        background: #FFF0EB;
+    }
+
+    .goal-left {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        text-align: left;
+    }
+
+    .goal-icon {
+        font-size: 28px;
+    }
+
+    .goal-label {
+        display: block;
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--lingo-ink);
+    }
+
+    .goal-desc {
+        display: block;
+        font-size: 12px;
+        color: var(--lingo-ink-muted);
+        margin-top: 2px;
+    }
+}
+
+// Footer
+.ob-footer {
+    padding-top: 24px;
+}
+
+.ob-error {
+    margin-top: 12px;
+    font-size: 13px;
+    color: #E8623A;
+    text-align: center;
+    line-height: 1.4;
+}
+
+.btn-next {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 15px;
+    background: var(--lingo-accent);
+    color: #fff;
+    border: none;
+    border-radius: var(--lingo-radius-sm);
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(232, 98, 58, 0.35);
+    transition: all 0.15s ease;
+
+    &:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+        box-shadow: none;
+    }
+
+    &:not(:disabled):hover {
+        transform: translateY(-1px);
+    }
+
+    ion-spinner {
+        --color: #fff;
+        width: 20px;
+        height: 20px;
+    }
+}
