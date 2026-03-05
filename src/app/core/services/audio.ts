@@ -107,7 +107,6 @@ export class AudioService {
         this.currentCharIndex.set(event.charIndex);
       }
     };
-
     window.speechSynthesis.speak(this.utterance);
     this.startWordBoundaryFallback(text);
   }

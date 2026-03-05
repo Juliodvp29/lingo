@@ -1,13 +1,183 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>vocab</ion-title>
-  </ion-toolbar>
-</ion-header>
-
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">vocab</ion-title>
-    </ion-toolbar>
-  </ion-header>
+
+  <div class="vocab-header">
+    <h1 class="vocab-title">Mi Vocabulario</h1>
+    <p class="vocab-sub">
+      {{ allWords().length }} palabras guardadas
+    </p>
+
+    <div class="vocab-tabs">
+      <button class="vtab" [class.active]="activeTab() === 'list'" (click)="switchTab('list')">
+        📚 Lista
+      </button>
+      <button class="vtab" [class.active]="activeTab() === 'review'" (click)="switchTab('review')">
+        🔁 Repasar
+        @if (store.reviewCount() > 0) {
+        <span class="vtab-badge">{{ store.reviewCount() }}</span>
+        }
+      </button>
+    </div>
+  </div>
+
+  @if (activeTab() === 'list') {
+
+  <div class="filter-chips">
+    @for (f of filters; track f.value) {
+    <button class="fchip" [class.active]="activeFilter() === f.value" (click)="activeFilter.set(f.value)">
+      {{ f.label }}
+    </button>
+    }
+  </div>
+
+  @if (loadingList()) {
+  <div class="center-spinner">
+    <ion-spinner name="crescent" color="primary"></ion-spinner>
+  </div>
+  }
+
+  @else if (filteredWords().length === 0) {
+  <div class="empty-state">
+    <span>📭</span>
+    <p>No tienes palabras en esta categoría aún.<br>
+      Lee una historia y toca las palabras para agregarlas.
+    </p>
+  </div>
+  }
+
+  @else {
+  <div class="word-list">
+    @for (item of filteredWords(); track item.id) {
+    <div class="word-card">
+      <div class="word-card-left">
+        <div class="word-row">
+          <span class="word-text">{{ item.vocabulary.word }}</span>
+          <button class="audio-btn" (click)="audio.pronounceWord(item.vocabulary.word)">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round">
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+              <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+            </svg>
+          </button>
+        </div>
+        @if (item.vocabulary.ipa) {
+        <span class="word-ipa">{{ item.vocabulary.ipa }}</span>
+        }
+        <p class="word-def">{{ item.vocabulary.definition_es }}</p>
+        @if (item.vocabulary.example_en) {
+        <p class="word-example">"{{ item.vocabulary.example_en }}"</p>
+        }
+      </div>
+      <div class="word-card-right">
+        <span class="status-badge" [style.background]="statusColor(item.status)">
+          {{ statusLabel(item.status) }}
+        </span>
+        @if (item.review_count > 0) {
+        <span class="review-count">{{ item.review_count }}x</span>
+        }
+      </div>
+    </div>
+    }
+  </div>
+  }
+  }
+
+  @if (activeTab() === 'review') {
+
+  @if (loadingReview()) {
+  <div class="center-spinner">
+    <ion-spinner name="crescent" color="primary"></ion-spinner>
+  </div>
+  }
+
+  @else if (reviewWords().length === 0) {
+  <div class="empty-state">
+    <span>🎉</span>
+    <p>¡No tienes palabras por repasar hoy!<br>
+      Vuelve mañana o lee más historias.
+    </p>
+  </div>
+  }
+
+  @else if (reviewDone()) {
+  <div class="review-done">
+    <div class="done-icon">🏆</div>
+    <h2>¡Sesión completada!</h2>
+    <p>Repasaste {{ reviewWords().length }} palabras</p>
+
+    <div class="done-stats">
+      <div class="done-stat">
+        <strong>{{ correctCount }}</strong>
+        <span>Correctas</span>
+      </div>
+      <div class="done-stat">
+        <strong>{{ reviewWords().length - correctCount }}</strong>
+        <span>A repasar</span>
+      </div>
+    </div>
+
+    <button class="btn-primary" (click)="loadReview()">
+      Repasar de nuevo
+    </button>
+  </div>
+  }
+
+  @else {
+  <div class="flashcard-wrap">
+
+    <div class="review-header">
+      <span class="review-counter">
+        {{ reviewIndex() + 1 }} / {{ reviewWords().length }}
+      </span>
+      <div class="review-prog-bar">
+        <div class="review-prog-fill" [style.width.%]="reviewProgress">
+        </div>
+      </div>
+    </div>
+
+    <div class="flashcard" [class.flipped]="showAnswer()">
+
+      <div class="fc-front">
+        <div class="fc-level-badge">
+          {{ currentReviewWord?.level | uppercase }}
+        </div>
+        <div class="fc-word">{{ currentReviewWord?.word }}</div>
+        @if (currentReviewWord?.ipa) {
+        <div class="fc-ipa">{{ currentReviewWord?.ipa }}</div>
+        }
+        <button class="fc-audio" (click)="audio.pronounceWord(currentReviewWord!.word)">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+            <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+          </svg>
+        </button>
+        <p class="fc-hint">¿Recuerdas el significado?</p>
+        <button class="btn-flip" (click)="flip()">
+          Ver definición
+        </button>
+      </div>
+
+      @if (showAnswer()) {
+      <div class="fc-back">
+        <div class="fc-word">{{ currentReviewWord?.word }}</div>
+        <p class="fc-def">{{ currentReviewWord?.definition_es }}</p>
+        @if (currentReviewWord?.example_en) {
+        <p class="fc-example">"{{ currentReviewWord?.example_en }}"</p>
+        }
+
+        <p class="fc-rate-label">¿Qué tan fácil fue recordarla?</p>
+        <div class="rate-btns">
+          <button class="rate-btn hard" (click)="rate(1)">😰 Difícil</button>
+          <button class="rate-btn ok" (click)="rate(3)">🙂 Regular</button>
+          <button class="rate-btn easy" (click)="rate(5)">😎 Fácil</button>
+        </div>
+      </div>
+      }
+    </div>
+
+  </div>
+  }
+  }
+
 </ion-content>
