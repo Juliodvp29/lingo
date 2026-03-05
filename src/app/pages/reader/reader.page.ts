@@ -83,28 +83,71 @@ export class ReaderPage implements OnInit, OnDestroy {
     }
   }
 
+  ionViewWillLeave() {
+    this.audio.stop();
+    this.saveState();
+  }
+
   ngOnDestroy() {
     this.audio.stop();
-    this.saveProgress(false);
+    this.saveState();
+  }
+
+  private hasSavedSession = false;
+
+  private saveState() {
+    const isCompleted = this.readProgress() >= 100 || !!this.sessionResult();
+    this.saveProgress(isCompleted);
+
+    if (!this.hasSavedSession && !this.showQuiz() && !this.showResult()) {
+      const minutesRead = Math.floor((Date.now() - this.startTime) / 60000);
+      if (minutesRead > 0) {
+        this.progSvc.recordSession(minutesRead, 0, 0).catch(e => console.error(e));
+        this.store.addSessionProgress(minutesRead, 0, 0);
+        this.hasSavedSession = true;
+      }
+    }
   }
 
   tokenize(text: string): TextToken[] {
     const tokens: TextToken[] = [];
-    const regex = /\w+|\W+/g;
+    const regex = /\{(\w+)\}/g;
+    let lastIndex = 0;
     let cleanOffset = 0;
     let match: RegExpExecArray | null;
 
     while ((match = regex.exec(text)) !== null) {
-      const chunk = match[0];
-      const isWord = /^\w+$/.test(chunk);
+      if (match.index > lastIndex) {
+        const plain = text.slice(lastIndex, match.index);
+        tokens.push({
+          type: 'text',
+          content: plain,
+          start: cleanOffset,
+          end: cleanOffset + plain.length
+        });
+        cleanOffset += plain.length;
+      }
+
+      const word = match[1];
       tokens.push({
-        type: isWord ? 'word' : 'text',
-        content: chunk,
-        key: isWord ? chunk.toLowerCase() : undefined,
+        type: 'word',
+        content: word,
+        key: word.toLowerCase(),
         start: cleanOffset,
-        end: cleanOffset + chunk.length
+        end: cleanOffset + word.length
       });
-      cleanOffset += chunk.length;
+      cleanOffset += word.length;
+      lastIndex = regex.lastIndex;
+    }
+
+    if (lastIndex < text.length) {
+      const plain = text.slice(lastIndex);
+      tokens.push({
+        type: 'text',
+        content: plain,
+        start: cleanOffset,
+        end: cleanOffset + plain.length
+      });
     }
 
     return tokens;
@@ -176,15 +219,24 @@ export class ReaderPage implements OnInit, OnDestroy {
     }
   }
 
+  private lastSavedProgress = 0;
+
   onScroll(event: any) {
     const el = event.detail;
-    const pct = Math.min(100, Math.round(
-      (el.scrollTop / (el.scrollHeight - el.contentHeight)) * 100
-    ));
-    this.readProgress.set(pct);
+    const maxScroll = el.scrollHeight - el.contentHeight;
 
-    if (pct > 0 && pct % 25 === 0) {
-      this.saveProgress(pct >= 100);
+    let pct = 100;
+    if (maxScroll > 0) {
+      pct = Math.min(100, Math.max(0, Math.round((el.scrollTop / maxScroll) * 100)));
+    }
+
+    if (pct > this.readProgress()) {
+      this.readProgress.set(pct);
+    }
+
+    if (this.readProgress() - this.lastSavedProgress >= 10 || this.readProgress() === 100) {
+      this.lastSavedProgress = this.readProgress();
+      this.saveProgress(this.readProgress() >= 100);
     }
   }
 
@@ -216,10 +268,10 @@ export class ReaderPage implements OnInit, OnDestroy {
 
   onQuizCompleted(result: SessionResult) {
     this.showQuiz.set(false);
-    const minutesRead = Math.round((Date.now() - this.startTime) / 60000);
+    const minutesRead = Math.max(Math.floor((Date.now() - this.startTime) / 60000), 1);
     const finalResult: SessionResult = {
       ...result,
-      minutesRead: Math.max(minutesRead, 1),
+      minutesRead,
       wordsLearned: this.wordsMarkedCount
     };
     this.sessionResult.set(finalResult);
@@ -230,7 +282,7 @@ export class ReaderPage implements OnInit, OnDestroy {
 
   private async completeWithoutQuiz() {
     const minutesRead = Math.max(
-      Math.round((Date.now() - this.startTime) / 60000), 1
+      Math.floor((Date.now() - this.startTime) / 60000), 1
     );
     const result: SessionResult = {
       score: 0, totalQuestions: 0,
@@ -245,14 +297,19 @@ export class ReaderPage implements OnInit, OnDestroy {
   }
 
   private async recordSession(result: SessionResult) {
+    if (this.hasSavedSession) return;
+    this.hasSavedSession = true;
     try {
       await this.progSvc.recordSession(
         result.minutesRead,
         result.xpAwarded,
         result.wordsLearned
       );
-      this.store.addXp(result.xpAwarded);
-    } catch (e) { console.error(e); }
+      this.store.addSessionProgress(result.minutesRead, result.xpAwarded, result.wordsLearned);
+    } catch (e) {
+      this.hasSavedSession = false;
+      console.error(e);
+    }
   }
 
   goHome() {
