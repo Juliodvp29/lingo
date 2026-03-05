@@ -138,11 +138,11 @@
 
       <div class="fc-front">
         <div class="fc-level-badge">
-          {{ currentReviewWord?.level | uppercase }}
+          {{ currentReviewWord.level | uppercase }}
         </div>
-        <div class="fc-word">{{ currentReviewWord?.word }}</div>
-        @if (currentReviewWord?.ipa) {
-        <div class="fc-ipa">{{ currentReviewWord?.ipa }}</div>
+        <div class="fc-word">{{ currentReviewWord.word }}</div>
+        @if (currentReviewWord.ipa) {
+        <div class="fc-ipa">{{ currentReviewWord.ipa }}</div>
         }
         <button class="fc-audio" (click)="audio.pronounceWord(currentReviewWord!.word)">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -160,10 +160,10 @@
 
       @if (showAnswer()) {
       <div class="fc-back">
-        <div class="fc-word">{{ currentReviewWord?.word }}</div>
-        <p class="fc-def">{{ currentReviewWord?.definition_es }}</p>
-        @if (currentReviewWord?.example_en) {
-        <p class="fc-example">"{{ currentReviewWord?.example_en }}"</p>
+        <div class="fc-word">{{ currentReviewWord.word }}</div>
+        <p class="fc-def">{{ currentReviewWord.definition_es }}</p>
+        @if (currentReviewWord.example_en) {
+        <p class="fc-example">"{{ currentReviewWord.example_en }}"</p>
         }
 
         <p class="fc-rate-label">¿Qué tan fácil fue recordarla?</p>

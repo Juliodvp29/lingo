@@ -1,13 +1,148 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>profile</ion-title>
-  </ion-toolbar>
-</ion-header>
-
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">profile</ion-title>
-    </ion-toolbar>
-  </ion-header>
+
+  @if (loading()) {
+    <div class="center-spinner">
+      <ion-spinner name="crescent" color="primary"></ion-spinner>
+    </div>
+  } @else {
+
+  <div class="profile-body">
+
+    <div class="profile-hero">
+      <div class="avatar">
+        {{ auth.user()?.display_name?.charAt(0)?.toUpperCase() ?? '?' }}
+      </div>
+      <h1 class="profile-name">{{ auth.user()?.display_name ?? 'Usuario' }}</h1>
+      <p class="profile-email">{{ auth.user()?.email }}</p>
+      <span class="level-pill">
+        {{ (auth.user()?.level ?? 'a1') | uppercase }}
+        · {{ levelLabel(auth.user()?.level ?? null) }}
+      </span>
+    </div>
+
+    <div class="quick-stats">
+      <div class="qs-card">
+        <span class="qs-icon">🔥</span>
+        <strong>{{ store.stats()?.streak_days ?? 0 }}</strong>
+        <span>Racha</span>
+      </div>
+      <div class="qs-card">
+        <span class="qs-icon">⚡</span>
+        <strong>{{ store.stats()?.xp_total ?? 0 }}</strong>
+        <span>XP total</span>
+      </div>
+      <div class="qs-card">
+        <span class="qs-icon">📖</span>
+        <strong>{{ store.stats()?.stories_completed ?? 0 }}</strong>
+        <span>Historias</span>
+      </div>
+      <div class="qs-card">
+        <span class="qs-icon">🟢</span>
+        <strong>{{ store.stats()?.words_known ?? 0 }}</strong>
+        <span>Conocidas</span>
+      </div>
+    </div>
+
+    <div class="section-card">
+      <div class="section-header">
+        <h2>Actividad esta semana</h2>
+        <span class="section-sub">{{ totalWeekMinutes }} min · +{{ totalWeekXp }} XP</span>
+      </div>
+
+      <div class="week-chart">
+        @for (day of weekGrid; track day.date) {
+          <div class="day-col">
+            <div class="bar-wrap">
+              <div class="bar"
+                   [class.today]="isToday(day.date)"
+                   [class.empty]="day.minutes === 0"
+                   [style.height.%]="day.minutes > 0 ? (day.minutes / maxMinutes) * 100 : 8">
+              </div>
+            </div>
+            <span class="day-label" [class.today]="isToday(day.date)">
+              {{ day.label }}
+            </span>
+            @if (day.minutes > 0) {
+              <span class="day-min">{{ day.minutes }}m</span>
+            }
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- ── Vocabulario ── -->
+    <div class="section-card">
+      <h2>Mis palabras</h2>
+
+      <div class="vocab-bars">
+        <div class="vbar-row">
+          <span class="vbar-label">🟢 Conocidas</span>
+          <div class="vbar-track">
+            <div class="vbar-fill known"
+                 [style.width.%]="totalVocab > 0
+                   ? (store.stats()?.words_known ?? 0) / totalVocab * 100
+                   : 0">
+            </div>
+          </div>
+          <span class="vbar-count">{{ store.stats()?.words_known ?? 0 }}</span>
+        </div>
+        <div class="vbar-row">
+          <span class="vbar-label">🟡 Aprendiendo</span>
+          <div class="vbar-track">
+            <div class="vbar-fill learning"
+                 [style.width.%]="totalVocab > 0
+                   ? (store.stats()?.words_learning ?? 0) / totalVocab * 100
+                   : 0">
+            </div>
+          </div>
+          <span class="vbar-count">{{ store.stats()?.words_learning ?? 0 }}</span>
+        </div>
+        <div class="vbar-row">
+          <span class="vbar-label">🔵 Nuevas</span>
+          <div class="vbar-track">
+            <div class="vbar-fill new"
+                 [style.width.%]="totalVocab > 0
+                   ? (store.stats()?.words_new ?? 0) / totalVocab * 100
+                   : 0">
+            </div>
+          </div>
+          <span class="vbar-count">{{ store.stats()?.words_new ?? 0 }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-card goal-card">
+      <div class="goal-left">
+        <h2>Meta diaria</h2>
+        <p>{{ auth.user()?.daily_goal_minutes ?? 10 }} minutos por día</p>
+      </div>
+      <div class="goal-ring">
+        <svg width="64" height="64" viewBox="0 0 64 64">
+          <circle cx="32" cy="32" r="26" fill="none"
+                  stroke="var(--lingo-border)" stroke-width="5"/>
+          <circle cx="32" cy="32" r="26" fill="none"
+                  stroke="var(--lingo-accent)" stroke-width="5"
+                  stroke-linecap="round"
+                  [attr.stroke-dasharray]="2 * 3.14159 * 26"
+                  [attr.stroke-dashoffset]="goalOffset"
+                  style="transform:rotate(-90deg);transform-origin:center;
+                         transition:stroke-dashoffset 1s ease"/>
+        </svg>
+        <span class="goal-pct">{{ goalPct }}%</span>
+      </div>
+    </div>
+
+    <button class="btn-signout" (click)="signOut()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+           stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+        <polyline points="16 17 21 12 16 7"/>
+        <line x1="21" y1="12" x2="9" y2="12"/>
+      </svg>
+      Cerrar sesión
+    </button>
+
+  </div>
+  }
+
 </ion-content>

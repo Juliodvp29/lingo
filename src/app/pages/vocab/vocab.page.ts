@@ -1,7 +1,7 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonContent, IonHeader, IonTitle, IonToolbar, IonSpinner } from '@ionic/angular/standalone';
+import { IonContent, IonSpinner } from '@ionic/angular/standalone';
 import { VocabularyService } from '@app/core/services/vocabulary';
 import { AudioService } from '@app/core/services/audio';
 import { AppStore } from '@app/core/store/app.store';
@@ -14,7 +14,7 @@ type Tab = 'list' | 'review';
   templateUrl: './vocab.page.html',
   styleUrls: ['./vocab.page.scss'],
   standalone: true,
-  imports: [IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, IonSpinner]
+  imports: [IonContent, CommonModule, FormsModule, IonSpinner]
 })
 export class VocabPage implements OnInit {
 

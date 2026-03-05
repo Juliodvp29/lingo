@@ -87,49 +87,29 @@ export class ReaderPage implements OnInit, OnDestroy {
     this.audio.stop();
     this.saveProgress(false);
   }
+
   tokenize(text: string): TextToken[] {
     const tokens: TextToken[] = [];
-    const regex = /\{(\w+)\}/g;
-    let lastIndex = 0;
+    const regex = /\w+|\W+/g;
     let cleanOffset = 0;
     let match: RegExpExecArray | null;
 
     while ((match = regex.exec(text)) !== null) {
-      if (match.index > lastIndex) {
-        const plain = text.slice(lastIndex, match.index);
-        tokens.push({
-          type: 'text',
-          content: plain,
-          start: cleanOffset,
-          end: cleanOffset + plain.length
-        });
-        cleanOffset += plain.length;
-      }
-
-      const word = match[1];
+      const chunk = match[0];
+      const isWord = /^\w+$/.test(chunk);
       tokens.push({
-        type: 'word',
-        content: word,
-        key: word.toLowerCase(),
+        type: isWord ? 'word' : 'text',
+        content: chunk,
+        key: isWord ? chunk.toLowerCase() : undefined,
         start: cleanOffset,
-        end: cleanOffset + word.length
+        end: cleanOffset + chunk.length
       });
-      cleanOffset += word.length;
-      lastIndex = regex.lastIndex;
-    }
-
-    if (lastIndex < text.length) {
-      const plain = text.slice(lastIndex);
-      tokens.push({
-        type: 'text',
-        content: plain,
-        start: cleanOffset,
-        end: cleanOffset + plain.length
-      });
+      cleanOffset += chunk.length;
     }
 
     return tokens;
   }
+
   toggleSceneAudio(scene: Scene, index: number) {
     if (this.audio.isSpeaking() && this.playingSceneIndex() === index) {
       this.audio.stop();
