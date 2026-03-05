@@ -173,6 +173,7 @@ ion-content {
         align-items: flex-start;
         justify-content: space-between;
         padding: 10px;
+        z-index: 0;
     }
 
     .story-level-dot {
@@ -181,6 +182,8 @@ ion-content {
         color: #fff;
         padding: 3px 8px;
         border-radius: 8px;
+        position: relative;
+        z-index: 2;
     }
 
     .story-done {
@@ -194,6 +197,8 @@ ion-content {
         justify-content: center;
         font-size: 13px;
         font-weight: 700;
+        position: relative;
+        z-index: 2;
     }
 
     .story-info {
@@ -228,15 +233,20 @@ ion-content {
     }
 
     .story-cover-img {
+        position: absolute;
+        inset: 0;
         width: 100%;
         height: 100%;
         object-fit: cover;
-        display: block;
+        z-index: 1;
     }
 
     .story-thumb-fallback {
+        position: absolute;
+        inset: 0;
         width: 100%;
         height: 100%;
+        z-index: 1;
     }
 }
 

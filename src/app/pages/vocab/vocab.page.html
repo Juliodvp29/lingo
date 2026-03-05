@@ -68,7 +68,8 @@
         }
       </div>
       <div class="word-card-right">
-        <span class="status-badge" [style.background]="statusColor(item.status)">
+        <span class="status-badge" [style.background]="statusColor(item.status)"
+          [style.color]="statusTextColor(item.status)">
           {{ statusLabel(item.status) }}
         </span>
         @if (item.review_count > 0) {

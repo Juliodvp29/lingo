@@ -142,4 +142,11 @@ export class VocabPage implements OnInit {
     return map[status];
   }
 
+  statusTextColor(status: VocabStatus): string {
+    const map: Record<VocabStatus, string> = {
+      new: '#3A7BE8', learning: '#A07A00', known: '#2E7D52'
+    };
+    return map[status];
+  }
+
 }
