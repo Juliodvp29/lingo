@@ -37,10 +37,10 @@
     <div class="scene-narration">
       <p class="scene-text">
         @for (token of item.tokens; track $index) {
-        <span [class.highlight]="playingSceneIndex() === sceneIndex && 
-                   audio.currentCharIndex() !== null && 
-                   audio.currentCharIndex()! >= token.start && 
-                   audio.currentCharIndex()! < token.end">
+        <span [class.highlight]="playingSceneIndex() === sceneIndex &&
+    audio.currentCharIndex() !== null &&
+    audio.currentCharIndex()! >= token.start &&
+    audio.currentCharIndex()! < token.end">
           @if (token.type === 'text') {
           <span>{{ token.content }}</span>
           } @else {
@@ -73,10 +73,10 @@
       <div class="dialogue-bubble">
         <p class="scene-text">
           @for (token of item.tokens; track $index) {
-          <span [class.highlight]="playingSceneIndex() === sceneIndex && 
-                     audio.currentCharIndex() !== null && 
-                     audio.currentCharIndex()! >= token.start && 
-                     audio.currentCharIndex()! < token.end">
+          <span [class.highlight]="playingSceneIndex() === sceneIndex &&
+    audio.currentCharIndex() !== null &&
+    audio.currentCharIndex()! >= token.start &&
+    audio.currentCharIndex()! < token.end">
             @if (token.type === 'text') {
             <span>{{ token.content }}</span>
             } @else {

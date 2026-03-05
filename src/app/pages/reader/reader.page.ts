@@ -87,7 +87,6 @@ export class ReaderPage implements OnInit, OnDestroy {
     this.audio.stop();
     this.saveProgress(false);
   }
-
   tokenize(text: string): TextToken[] {
     const tokens: TextToken[] = [];
     const regex = /\{(\w+)\}/g;
@@ -95,27 +94,16 @@ export class ReaderPage implements OnInit, OnDestroy {
     let cleanOffset = 0;
     let match: RegExpExecArray | null;
 
-    const pushTextWords = (txt: string, startOffset: number) => {
-      // Split by words and whitespace, keep punctuation attached to words for now
-      const parts = txt.split(/(\s+)/);
-      let localOffset = startOffset;
-      for (const part of parts) {
-        if (!part) continue;
-        tokens.push({
-          type: 'text',
-          content: part,
-          start: localOffset,
-          end: localOffset + part.length
-        });
-        localOffset += part.length;
-      }
-      return localOffset;
-    };
-
     while ((match = regex.exec(text)) !== null) {
       if (match.index > lastIndex) {
-        const content = text.slice(lastIndex, match.index);
-        cleanOffset = pushTextWords(content, cleanOffset);
+        const plain = text.slice(lastIndex, match.index);
+        tokens.push({
+          type: 'text',
+          content: plain,
+          start: cleanOffset,
+          end: cleanOffset + plain.length
+        });
+        cleanOffset += plain.length;
       }
 
       const word = match[1];
@@ -131,13 +119,17 @@ export class ReaderPage implements OnInit, OnDestroy {
     }
 
     if (lastIndex < text.length) {
-      const content = text.slice(lastIndex);
-      pushTextWords(content, cleanOffset);
+      const plain = text.slice(lastIndex);
+      tokens.push({
+        type: 'text',
+        content: plain,
+        start: cleanOffset,
+        end: cleanOffset + plain.length
+      });
     }
 
     return tokens;
   }
-
   toggleSceneAudio(scene: Scene, index: number) {
     if (this.audio.isSpeaking() && this.playingSceneIndex() === index) {
       this.audio.stop();
