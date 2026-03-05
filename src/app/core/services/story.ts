@@ -33,6 +33,7 @@ export class StoryService {
     const { data, error } = await query;
     if (error) throw error;
 
+    // Map raw data to StoryWithProgress, handling nested JSON scenes
     return (data as any[]).map(story => ({
       ...story,
       scenes: story.scenes?.scenes ?? story.scenes ?? [],
@@ -73,7 +74,7 @@ export class StoryService {
         read_percentage: readPercentage,
         completed,
         completed_at: completed ? new Date().toISOString() : null
-      }, { onConflict: 'user_id,story_id' });
+      }, { onConflict: 'user_id,story_id' }); // Handle existing progress entries
 
     if (error) throw error;
   }

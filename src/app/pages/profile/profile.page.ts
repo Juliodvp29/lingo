@@ -47,6 +47,7 @@ export class ProfilePage implements OnInit {
       const d = new Date();
       d.setDate(d.getDate() - i);
       const dateStr = d.toISOString().split('T')[0];
+      // Map week day label and match with activity data from the database
       const dayLabel = this.weekDays[d.getDay() === 0 ? 6 : d.getDay() - 1];
       const found = this.weeklyData().find(w => w.date === dateStr);
       days.push({ label: dayLabel, minutes: found?.minutes_read ?? 0, date: dateStr });

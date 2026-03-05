@@ -43,6 +43,7 @@ export class LoginPage {
     togglePass() { this.showPass.update(v => !v); }
 
     async signIn() {
+        // Stop if form is invalid and show validation errors
         if (this.form.invalid) { this.form.markAllAsTouched(); return; }
         this.isLoading.set(true);
         this.errorMsg.set('');
@@ -53,6 +54,7 @@ export class LoginPage {
             );
             this.router.navigate(['/tabs/home']);
         } catch (err: any) {
+            // Display user-friendly error message based on Supabase response
             this.errorMsg.set(this.mapError(err.message));
         } finally {
             this.isLoading.set(false);

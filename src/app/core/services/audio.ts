@@ -18,8 +18,10 @@ export class AudioService {
     this.stop();
 
     if (this.isNative && TextToSpeech) {
+      // Use native TTS for mobile platforms
       await this.speakNative(text, onEnd);
     } else {
+      // Fallback to Web Speech API in browsers
       this.speakWeb(text, onEnd);
     }
   }
@@ -30,6 +32,7 @@ export class AudioService {
 
       const words = this.extractWords(text);
 
+      // Start highlighting timer as native TTS doesn't provide word boundaries
       setTimeout(() => {
         if (this.isSpeaking()) {
           this.runTimerBasedHighlight(words);
@@ -103,6 +106,7 @@ export class AudioService {
       this.clearWordTimer();
     };
     this.utterance.onboundary = (event) => {
+      // Sync signal with browser's word boundary events
       if (event.name === 'word') {
         this.currentCharIndex.set(event.charIndex);
       }
@@ -140,6 +144,7 @@ export class AudioService {
       this.currentCharIndex.set(words[i].start);
       i++;
 
+      // Adjust delay based on word length for a more natural highlight rhythm
       const currentWord = words[i - 1]?.word ?? '';
       const nextWord = words[i]?.word ?? '';
       const dynamicDelay = msPerWord * (0.5 + (nextWord.length / 8));

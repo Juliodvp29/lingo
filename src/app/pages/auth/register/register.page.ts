@@ -10,6 +10,7 @@ import { AuthService } from '@app/core/services/auth';
 function passwordsMatch(control: AbstractControl): ValidationErrors | null {
     const pw = control.get('password')?.value;
     const cpw = control.get('confirmPassword')?.value;
+    // Cross-field validator to ensure passwords match during registration
     return pw && cpw && pw !== cpw ? { mismatch: true } : null;
 }
 
@@ -65,6 +66,7 @@ export class RegisterPage {
                 this.displayName.value!
             );
             this.success.set(true);
+            // Auto-redirect to onboarding after successful registration
             setTimeout(() => this.router.navigate(['/onboarding']), 1500);
         } catch (err: any) {
             this.errorMsg.set(this.mapError(err.message));

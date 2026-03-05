@@ -30,6 +30,7 @@ export class WordCardComponent {
   protected statusList: VocabStatus[] = ['new', 'learning', 'known'];
 
   select(status: VocabStatus) {
+    // Emit event to update word status in the database via parent component
     this.statusChange.emit(status);
   }
 

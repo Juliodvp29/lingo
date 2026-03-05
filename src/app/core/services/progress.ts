@@ -52,6 +52,7 @@ export class ProgressService {
     const userId = this.auth.user()?.id;
     if (!userId) return;
 
+    // Use database RPC to update daily statistics (minutes, XP, words)
     const { error } = await this.db.rpc('update_daily_progress', {
       p_user_id: userId,
       p_minutes: minutesRead,

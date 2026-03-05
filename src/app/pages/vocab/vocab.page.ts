@@ -30,6 +30,7 @@ export class VocabPage implements OnInit {
 
   filteredWords = computed(() => {
     const f = this.activeFilter();
+    // Dynamically filter vocabulary list based on selected status (New, Learning, Known)
     return f ? this.allWords().filter(w => w.status === f) : this.allWords();
   });
 
@@ -95,6 +96,7 @@ export class VocabPage implements OnInit {
   flip() {
     this.showAnswer.set(true);
     if (this.currentReviewWord) {
+      // Speak the word automatically when revealing the translation
       this.audio.pronounceWord(this.currentReviewWord.word);
     }
   }
@@ -106,6 +108,7 @@ export class VocabPage implements OnInit {
     this.reviewResults.update(r => [...r, { word: word.word, quality }]);
 
     try {
+      // Use SRS algorithm (Spaced Repetition System) to process the word review
       await this.vocabSvc.processReview(word.user_vocab_id, quality);
     } catch (e) {
       console.error(e);

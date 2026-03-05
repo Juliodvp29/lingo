@@ -56,6 +56,7 @@ export class HomePage implements OnInit {
   }
 
   async handleRefresh(event: any) {
+    // Reload stats and stories concurrently for better performance
     const [stats, todayProgress] = await Promise.all([
       this.progress.getUserStats(),
       this.progress.getTodayProgress(),
@@ -72,6 +73,7 @@ export class HomePage implements OnInit {
 
   get ringOffset(): number {
     const circumference = 2 * Math.PI * 32;
+    // Calculate SVG stroke-dashoffset for circular progress ring
     return circumference * (1 - this.store.dailyGoalProgress());
   }
 

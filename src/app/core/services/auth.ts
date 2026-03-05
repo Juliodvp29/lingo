@@ -26,12 +26,14 @@ export class AuthService {
 
 
   private async init(): Promise<void> {
+    // Check for existing session on startup
     const { data: { session } } = await this.db.auth.getSession();
     if (session) {
       await this.loadUserProfile(session.user.id);
     }
     this._loading.set(false);
 
+    // React to auth state changes (login, logout)
     this.db.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_IN' && session) {
         await this.loadUserProfile(session.user.id);
@@ -44,6 +46,7 @@ export class AuthService {
   }
 
   private async loadUserProfile(userId: string): Promise<void> {
+    // Fetch profile data from 'users' table and update signal
     const { data, error } = await this.db
       .from('users')
       .select('*')
@@ -75,6 +78,7 @@ export class AuthService {
   }
 
   async signInWithGoogle() {
+    // Trigger OAuth flow with Google provider
     const { error } = await this.db.auth.signInWithOAuth({
       provider: 'google',
       options: { redirectTo: window.location.origin + '/tabs/home' }

@@ -25,6 +25,7 @@ export class QuizComponent {
   }
 
   selectOption(idx: number) {
+    // Only allow one answer per question
     if (this.answered()) return;
     this.selectedIndex.set(idx);
     this.answered.set(true);
@@ -56,6 +57,7 @@ export class QuizComponent {
     this.completed.emit({
       score: s,
       totalQuestions: total,
+      // Map quiz performance to XP and word mastery gains
       xpAwarded: s * 10,
       wordsLearned: s,
       minutesRead: 5

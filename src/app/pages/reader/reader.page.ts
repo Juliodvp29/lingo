@@ -102,6 +102,7 @@ export class ReaderPage implements OnInit, OnDestroy {
     if (!this.hasSavedSession && !this.showQuiz() && !this.showResult()) {
       const minutesRead = Math.floor((Date.now() - this.startTime) / 60000);
       if (minutesRead > 0) {
+        // Log session duration and award progress when leaving the reader
         this.progSvc.recordSession(minutesRead, 0, 0).catch(e => console.error(e));
         this.store.addSessionProgress(minutesRead, 0, 0);
         this.hasSavedSession = true;
@@ -129,6 +130,7 @@ export class ReaderPage implements OnInit, OnDestroy {
       }
 
       const word = match[1];
+      // Create a word token for highlightable terms wrapped in curly braces {word}
       tokens.push({
         type: 'word',
         content: word,
@@ -231,6 +233,7 @@ export class ReaderPage implements OnInit, OnDestroy {
     }
 
     if (pct > this.readProgress()) {
+      // Update reading progress signal as user scrolls down
       this.readProgress.set(pct);
     }
 

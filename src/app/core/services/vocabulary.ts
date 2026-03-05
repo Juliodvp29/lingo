@@ -12,14 +12,14 @@ export class VocabularyService {
   constructor(
     private supabase: SupabaseService,
     private auth: AuthService
-  ) {}
+  ) { }
 
   async lookupWord(word: string): Promise<Vocabulary | null> {
     const { data, error } = await this.db
       .from('vocabulary')
       .select('*')
       .eq('word', word.toLowerCase())
-      .maybeSingle(); 
+      .maybeSingle();
 
     if (error) throw error;
     return data as Vocabulary | null;
@@ -50,7 +50,7 @@ export class VocabularyService {
         vocab_id: vocabId,
         status,
         last_seen_at: new Date().toISOString()
-      }, { onConflict: 'user_id,vocab_id' });
+      }, { onConflict: 'user_id,vocab_id' }); // Track when a word was last encountered
 
     if (error) throw error;
   }
@@ -84,7 +84,7 @@ export class VocabularyService {
       .from('v_words_due_today')
       .select('*')
       .eq('user_id', userId)
-      .order('next_review_at', { ascending: true });
+      .order('next_review_at', { ascending: true }); // Fetch words matching SRS schedule
 
     if (error) throw error;
     return data as WordDueToday[];
@@ -102,10 +102,11 @@ export class VocabularyService {
 
     if (!uvData) return;
 
+    // Call database function to calculate next review date based on performance
     const { error } = await this.db.rpc('process_srs_review', {
-      p_user_id:  userId,
+      p_user_id: userId,
       p_vocab_id: uvData.vocab_id,
-      p_quality:  quality
+      p_quality: quality
     });
 
     if (error) throw error;

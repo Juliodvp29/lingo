@@ -17,6 +17,7 @@ export class AppStore {
     const progress = this._todayProgress();
     const stats = this._stats();
     if (!progress || !stats) return 0;
+    // Calculate progress ratio against a fixed daily goal (10 minutes)
     const goal = stats.xp_total > 0 ? 10 : 10;
     return Math.min(1, progress.minutes_read / goal);
   });
@@ -48,7 +49,7 @@ export class AppStore {
       };
     });
     this.addXp(xp);
-  }
+  } // Update stats signal as well when session is saved
 
   incrementStreak() {
     this._stats.update(s => s ? { ...s, streak_days: s.streak_days + 1 } : s);
