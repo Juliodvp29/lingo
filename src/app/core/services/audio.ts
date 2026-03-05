@@ -1,4 +1,6 @@
 import { Injectable, signal } from '@angular/core';
+import { Capacitor } from '@capacitor/core';
+import { TextToSpeech } from '@capacitor-community/text-to-speech';
 
 @Injectable({
   providedIn: 'root',
@@ -8,18 +10,57 @@ export class AudioService {
   readonly currentCharIndex = signal<number | null>(null);
   readonly isSupported = true;
 
+  private isNative = Capacitor.isNativePlatform();
   private utterance: SpeechSynthesisUtterance | null = null;
   private wordBoundaryTimer: any = null;
 
-  speak(text: string, onEnd?: () => void): void {
+  async speak(text: string, onEnd?: () => void): Promise<void> {
+    this.stop();
+
+    if (this.isNative && TextToSpeech) {
+      await this.speakNative(text, onEnd);
+    } else {
+      this.speakWeb(text, onEnd);
+    }
+  }
+
+  private async speakNative(text: string, onEnd?: () => void): Promise<void> {
+    try {
+      this.isSpeaking.set(true);
+
+      const words = this.extractWords(text);
+
+      setTimeout(() => {
+        if (this.isSpeaking()) {
+          this.runTimerBasedHighlight(words);
+        }
+      }, 350);
+
+      await TextToSpeech.speak({
+        text,
+        lang: 'en-US',
+        rate: 0.85,
+        pitch: 1.0,
+        volume: 1.0,
+        category: 'ambient',
+      });
+
+      this.isSpeaking.set(false);
+      this.currentCharIndex.set(null);
+      this.clearWordTimer();
+      onEnd?.();
+    } catch (e) {
+      console.error('[AudioService] TTS nativo error:', e);
+      this.isSpeaking.set(false);
+      this.clearWordTimer();
+    }
+  }
+
+  private speakWeb(text: string, onEnd?: () => void): void {
     if (!('speechSynthesis' in window)) {
       console.warn('[AudioService] speechSynthesis no disponible');
-      onEnd?.();
       return;
     }
-
-    if (!this.isSupported) return;
-    this.stop();
 
     this.utterance = new SpeechSynthesisUtterance(text);
     this.utterance.lang = 'en-US';
@@ -43,27 +84,24 @@ export class AudioService {
     if (window.speechSynthesis.getVoices().length) {
       setVoice();
     } else {
-      window.speechSynthesis.onvoiceschanged = () => { setVoice(); };
+      window.speechSynthesis.onvoiceschanged = setVoice;
     }
 
     this.utterance.onstart = () => {
       this.isSpeaking.set(true);
       this.currentCharIndex.set(0);
     };
-
     this.utterance.onend = () => {
       this.isSpeaking.set(false);
       this.currentCharIndex.set(null);
       this.clearWordTimer();
       onEnd?.();
     };
-
     this.utterance.onerror = () => {
       this.isSpeaking.set(false);
       this.currentCharIndex.set(null);
       this.clearWordTimer();
     };
-
     this.utterance.onboundary = (event) => {
       if (event.name === 'word') {
         this.currentCharIndex.set(event.charIndex);
@@ -71,55 +109,44 @@ export class AudioService {
     };
 
     window.speechSynthesis.speak(this.utterance);
-
     this.startWordBoundaryFallback(text);
   }
 
-  private startWordBoundaryFallback(text: string): void {
+  private extractWords(text: string): { word: string; start: number }[] {
     const words: { word: string; start: number }[] = [];
     const regex = /\S+/g;
     let m: RegExpExecArray | null;
     while ((m = regex.exec(text)) !== null) {
       words.push({ word: m[0], start: m.index });
     }
-
-    if (!words.length) return;
-
-    let boundaryFired = false;
-
-    const origBoundary = this.utterance!.onboundary;
-    this.utterance!.onboundary = (event) => {
-      boundaryFired = true;
-      origBoundary?.call(this.utterance!, event);
-    };
-
-    const checkTimer = setTimeout(() => {
-      if (!boundaryFired && this.isSpeaking()) {
-        this.runTimerBasedHighlight(words, text.length);
-      }
-    }, 350);
-
-    this.wordBoundaryTimer = checkTimer;
+    return words;
   }
 
-  private runTimerBasedHighlight(
-    words: { word: string; start: number }[],
-    totalLength: number
-  ): void {
-    const wpm = 140 * 0.82;
-    const totalWords = words.length;
-    const totalMs = (totalWords / wpm) * 60 * 1000;
-    const msPerWord = totalMs / totalWords;
+  private startWordBoundaryFallback(text: string): void {
+    const words = this.extractWords(text);
+    if (!words.length) return;
+    this.runTimerBasedHighlight(words);
+  }
+  private runTimerBasedHighlight(words: { word: string; start: number }[], totalChars?: number): void {
+    if (!words.length) return;
+
+    const charsPerSecond = 13;
+    const totalText = words.map(w => w.word).join(' ');
+    const estimatedTotalMs = (totalText.length / charsPerSecond) * 1000;
+    const msPerWord = estimatedTotalMs / words.length;
 
     let i = 0;
-
     const tick = () => {
       if (!this.isSpeaking() || i >= words.length) return;
       this.currentCharIndex.set(words[i].start);
       i++;
-      this.wordBoundaryTimer = setTimeout(tick, msPerWord);
-    };
 
+      const currentWord = words[i - 1]?.word ?? '';
+      const nextWord = words[i]?.word ?? '';
+      const dynamicDelay = msPerWord * (0.5 + (nextWord.length / 8));
+
+      this.wordBoundaryTimer = setTimeout(tick, dynamicDelay);
+    };
     tick();
   }
 
@@ -131,7 +158,11 @@ export class AudioService {
   }
 
   stop(): void {
-    window.speechSynthesis.cancel();
+    if (this.isNative && TextToSpeech) {
+      TextToSpeech.stop().catch(() => { });
+    } else if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+    }
     this.isSpeaking.set(false);
     this.currentCharIndex.set(null);
     this.clearWordTimer();
