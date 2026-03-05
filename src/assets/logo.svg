@@ -1,0 +1,10 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background Circle (Safe Area) -->
+  <rect width="512" height="512" rx="120" fill="#E8623A"/>
+  
+  <!-- Speech Bubble Glow/Subtle Gradient Effect (Optional for Depth) -->
+  <path d="M120 140C120 117.909 137.909 100 160 100H352C374.091 100 392 117.909 392 140V320C392 342.091 374.091 360 352 360H220L140 420V360C128.954 360 120 351.046 120 340V140Z" fill="white"/>
+  
+  <!-- Stylized "L" for Lingo -->
+  <path d="M210 170V300H290" stroke="#E8623A" stroke-width="40" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
