@@ -61,16 +61,6 @@ export class LoginPage {
         }
     }
 
-    async signInWithGoogle() {
-        this.isLoading.set(true);
-        try {
-            await this.auth.signInWithGoogle();
-        } catch (err: any) {
-            this.errorMsg.set(this.mapError(err.message));
-            this.isLoading.set(false);
-        }
-    }
-
     private mapError(msg: string): string {
         if (msg?.includes('Invalid login')) return 'Email o contraseña incorrectos.';
         if (msg?.includes('Email not confirmed')) return 'Confirma tu email antes de entrar.';
