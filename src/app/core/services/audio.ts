@@ -6,12 +6,18 @@ import { Injectable, signal } from '@angular/core';
 export class AudioService {
   readonly isSpeaking = signal(false);
   readonly currentCharIndex = signal<number | null>(null);
-  readonly isSupported = 'speechSynthesis' in window;
+  readonly isSupported = true;
 
   private utterance: SpeechSynthesisUtterance | null = null;
   private wordBoundaryTimer: any = null;
 
   speak(text: string, onEnd?: () => void): void {
+    if (!('speechSynthesis' in window)) {
+      console.warn('[AudioService] speechSynthesis no disponible');
+      onEnd?.();
+      return;
+    }
+
     if (!this.isSupported) return;
     this.stop();
 

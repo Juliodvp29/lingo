@@ -76,3 +76,14 @@ Thumbs.db
 
 # public
 /public
+
+# android
+/android
+
+# ios
+/ios
+
+# capacitor
+/capacitor.config.json
+
+/www
